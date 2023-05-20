@@ -6,8 +6,8 @@ from sklearn.neural_network import MLPClassifier
 import joblib
 
 # Load the trained model and scaler
-mlp = joblib.load("trained_model.h5")
-scaler = joblib.load("scaler.pkl")
+mlp = joblib.load("https://github.com/drazzam/DCI_Predictor/raw/main/trained_model.h5")
+scaler = joblib.load("https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl")
 
 # Define the input features and their types
 features = [
