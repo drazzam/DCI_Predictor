@@ -4,10 +4,18 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
 import joblib
+import requests
+from io import BytesIO
 
-# Load the trained model and scaler
-mlp = joblib.load("https://github.com/drazzam/DCI_Predictor/raw/main/trained_model.h5")
-scaler = joblib.load("https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl")
+# Download and load the trained model and scaler
+model_url = "https://github.com/drazzam/DCI_Predictor/raw/main/trained_model.h5"
+scaler_url = "https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl"
+
+model_response = requests.get(model_url)
+scaler_response = requests.get(scaler_url)
+
+mlp = joblib.load(BytesIO(model_response.content))
+scaler = joblib.load(BytesIO(scaler_response.content))
 
 # Define the input features and their types
 features = [
