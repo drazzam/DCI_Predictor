@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.neural_network import MLPClassifier
+from tensorflow.keras.models import load_model
 import joblib
 import requests
 from io import BytesIO
@@ -14,7 +14,7 @@ scaler_url = "https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl"
 model_response = requests.get(model_url)
 scaler_response = requests.get(scaler_url)
 
-mlp = joblib.load(BytesIO(model_response.content))
+mlp = load_model(BytesIO(model_response.content))
 scaler = joblib.load(BytesIO(scaler_response.content))
 
 # Define the input features and their types
@@ -81,7 +81,7 @@ input_df = pd.get_dummies(input_df, columns=categorical_features)
 X = scaler.transform(input_df)
 
 # Make the prediction
-prediction = mlp.predict(X)
+prediction = mlp.predict_classes(X)
 confidence = mlp.predict_proba(X) * 100
 
 # Display the result
