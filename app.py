@@ -114,4 +114,3 @@ confidence_percentage = round(prediction_proba[0][0] * 100, 2) if prediction[0][
 if st.button("Make Prediction"):
     result = "Delayed Cerebral Ischemia Is Predicted to Occur In This Patient" if prediction[0][0] == 1 else "Delayed Cerebral Ischemia Is NOT Predicted to Occur In This Patient"
     st.write(f"Prediction: **{result}**")
-    st.write(f"Confidence: **{confidence_percentage}%**")
