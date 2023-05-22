@@ -10,6 +10,8 @@ from tensorflow.keras.optimizers import Adam
 import requests
 from io import BytesIO
 
+st.title("Delayed Cerebral Ischemia Prediction")
+
 # Load the dataset from a CSV file
 data_url = "https://github.com/drazzam/DCI_Predictor/raw/main/data.csv"
 data_response = requests.get(data_url)
@@ -38,15 +40,60 @@ mlp.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.001), met
 # Train the model
 mlp.fit(X_train_scaled, y_train, epochs=50, batch_size=32, verbose=0)
 
+# Dictionary to map column names to user-friendly labels
+col_labels = {
+    'nimodipine': 'Nimodipine',
+    'hypertension': 'Hypertension',
+    'diabetes': 'Diabetes',
+    'hypercholestorelemia': 'Hypercholesterolemia',
+    'congestive_heart_failure': 'Congestive Heart Failure',
+    'cancer': 'Cancer',
+    'smoking': 'Smoking',
+    'alcohol': 'Alcohol',
+    'cocaine': 'Cocaine',
+    'location_of_aneurysm': 'Location of Aneurysm',
+    'treatment_modality': 'Treatment Modality',
+    'evd': 'EVD',
+    'vp_shunt': 'VP Shunt',
+    'tcd_vasospasm': 'TCD Vasospasm',
+    'angiographic_vasospasm': 'Angiographic Vasospasm',
+    'clinical_vasospasm': 'Clinical Vasospasm'
+}
+
 # Create input fields for each feature
 user_input = {}
 for column in X.columns:
-    if X[column].dtype == float:
-        user_input[column] = st.number_input(f"Enter {column}:", value=float())
-    elif X[column].dtype == int:
-        user_input[column] = st.number_input(f"Enter {column}:", value=int())
+    if column in col_labels:
+        label = col_labels[column]
+    else:
+        label = column.capitalize()
 
-# Prepare the input data as a dataframe
+    if column in ['nimodipine', 'hypertension', 'diabetes', 'hypercholestorelemia',
+                  'congestive_heart_failure', 'cancer', 'smoking', 'alcohol', 'cocaine',
+                  'evd', 'vp_shunt', 'tcd_vasospasm', 'angiographic_vasospasm', 'clinical_vasospasm']:
+        user_input[column] = st.selectbox(f"{label} (Yes/No):", options=["Yes", "No"])
+        user_input[column] = 1 if user_input[column] == "Yes" else 0
+    elif column == 'location_of_aneurysm':
+        user_input[column] = st.selectbox(f"{label}:", options=["Anterior Communicating Artery",
+                                                                "Middle Cerebral Artery",
+                                                                "Anterior Cerebral Artery",
+                                                                "Internal Carotid Artery",
+                                                                "Posterior Communicating Artery",
+                                                                "Basilar Artery",
+                                                                "Posterior Inferior Cerebellar Artery"])
+        user_input[column] = {"Anterior Communicating Artery": 1,
+                              "Middle Cerebral Artery": 2,
+                              "Anterior Cerebral Artery": 3,
+                              "Internal Carotid Artery": 4,
+                              "Posterior Communicating Artery": 5,
+                              "Basilar Artery": 6,
+                              "Posterior Inferior Cerebellar Artery": 7}[user_input[column]]
+    elif column == 'treatment_modality':
+        user_input[column] = st.selectbox(f"{label}:", options=["Endovascular Coiling",
+                                                                "Neurosurgical Clipping"])
+        user_input[column] = 0 if user_input[column] == "Endovascular Coiling" else 1
+
+# Prepare the input data as adataframe
 input_df = pd.DataFrame([user_input])
 
 # Preprocess the input data
@@ -54,11 +101,12 @@ input_df = pd.DataFrame([user_input])
 input_scaled = scaler.transform(input_df)
 
 # Make the prediction
-prediction = mlp.predict_classes(input_scaled)
-confidence = mlp.predict_proba(input_scaled) * 100
+prediction = (mlp.predict(input_scaled) > 0.5).astype("int32")
+confidence = mlp.predict(input_scaled) * 100
 
 # Display the result
-if prediction[0] == 0:
-    st.write(f"Delayed Cerebral Ischemia is not predicted to occur. Confidence: {confidence[0][0]:.2f}%")
-else:
-    st.write(f"Delayed Cerebral Ischemia is predicted to occur. Confidence: {confidence[0][1]:.2f}%")
+if st.button("Make Prediction"):
+    if prediction[0] == 0:
+        st.write(f"Delayed Cerebral Ischemia is not predicted to occur. Confidence: {confidence[0][0]:.2f}%")
+    else:
+        st.write(f"Delayed Cerebral Ischemia is predicted to occur. Confidence: {confidence[0][1]:.2f}%")
