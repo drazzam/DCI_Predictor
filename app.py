@@ -6,6 +6,7 @@ from tensorflow.keras.models import load_model
 import joblib
 import requests
 from io import BytesIO
+import tempfile
 
 # Download and load the trained model and scaler
 model_url = "https://github.com/drazzam/DCI_Predictor/raw/main/trained_model.h5"
@@ -14,8 +15,18 @@ scaler_url = "https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl"
 model_response = requests.get(model_url)
 scaler_response = requests.get(scaler_url)
 
-mlp = load_model(BytesIO(model_response.content))
-scaler = joblib.load(BytesIO(scaler_response.content))
+# Save model and scaler as temporary files
+temp_model_file = tempfile.NamedTemporaryFile(suffix='.h5', delete=False)
+temp_model_file.write(model_response.content)
+temp_model_file.close()
+
+temp_scaler_file = tempfile.NamedTemporaryFile(suffix='.pkl', delete=False)
+temp_scaler_file.write(scaler_response.content)
+temp_scaler_file.close()
+
+# Load model and scaler from temporary files
+mlp = load_model(temp_model_file.name)
+scaler = joblib.load(temp_scaler_file.name)
 
 # Define the input features and their types
 features = [
