@@ -71,6 +71,8 @@ for column in X.columns:
         user_input[column] = st.number_input(f"{label}:", step=None, format="%f")
     elif column in ['HH Score', 'mFisher Score']:
         user_input[column] = st.number_input(f"{label}:", min_value=0, step=1, format="%i")
+    elif column == 'Side':
+        user_input[column] = st.selectbox(f"{label}":, options= ["Right", "Left"])
 
 # Prepare the input data as a DataFrame
 input_df = pd.DataFrame([user_input])
