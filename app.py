@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import Sequential
@@ -18,55 +19,36 @@ data_response = requests.get(data_url)
 data = pd.read_csv(BytesIO(data_response.content))
 
 # Preprocess the data
-# Replace this with your own preprocessing steps based on the dataset
 X = data.drop('dci', axis=1)
 y = data['dci']
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Define the column transformer for preprocessing
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), X.columns),
+        ('cat', OneHotEncoder(), ['Location of Aneurysm', 'Treatment Modality'])
+    ])
 
-# Scale the data
-scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+# Apply the column transformer to the data
+X_preprocessed = preprocessor.fit_transform(X)
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X_preprocessed, y, test_size=0.2, random_state=42)
 
 # Define and compile the MLP model
 mlp = Sequential()
-mlp.add(Dense(64, input_dim=X_train_scaled.shape[1], activation='relu'))
+mlp.add(Dense(64, input_dim=X_train.shape[1], activation='relu'))
 mlp.add(Dense(32, activation='relu'))
 mlp.add(Dense(1, activation='sigmoid'))
 mlp.compile(loss='binary_crossentropy', optimizer=Adam(learning_rate=0.001), metrics=['accuracy'])
 
 # Train the model
-mlp.fit(X_train_scaled, y_train, epochs=50, batch_size=32, verbose=0)
-
-# Dictionary to map column names to user-friendly labels
-col_labels = {
-    'Nimodipine': 'Nimodipine',
-    'Hypertension': 'Hypertension',
-    'Diabetes': 'Diabetes',
-    'Hypercholestorelemia': 'Hypercholesterolemia',
-    'Congestive Heart Failure': 'Congestive Heart Failure',
-    'Cancer': 'Cancer',
-    'Smoking': 'Smoking',
-    'Alcohol': 'Alcohol',
-    'Cocaine': 'Cocaine',
-    'Location of Aneurysm': 'Location of Aneurysm',
-    'Treatment Modality': 'Treatment Modality',
-    'EVD': 'EVD',
-    'VP Shunt': 'VP Shunt',
-    'TCD Vasospasm': 'TCD Vasospasm',
-    'Angiographic Vasospasm': 'Angiographic Vasospasm',
-    'Clinical Vasospasm': 'Clinical Vasospasm'
-}
+mlp.fit(X_train, y_train, epochs=50, batch_size=32, verbose=0)
 
 # Create input fields for each feature
 user_input = {}
 for column in X.columns:
-    if column in col_labels:
-        label = col_labels[column]
-    else:
-        label = column.capitalize()
+    label = column.capitalize()
 
     if column in ['Nimodipine', 'Hypertension', 'Diabetes', 'Hypercholestorelemia',
                   'Congestive Heart Failure', 'Cancer', 'Smoking', 'Alcohol', 'Cocaine',
@@ -81,28 +63,19 @@ for column in X.columns:
                                                                 "Posterior Communicating Artery",
                                                                 "Basilar Artery",
                                                                 "Posterior Inferior Cerebellar Artery"])
-        user_input[column] = {"Anterior Communicating Artery": 1,
-                              "Middle Cerebral Artery": 2,
-                              "Anterior Cerebral Artery": 3,
-                              "Internal Carotid Artery": 4,
-                              "Posterior Communicating Artery": 5,
-                              "Basilar Artery": 6,
-                              "Posterior Inferior Cerebellar Artery": 7}[user_input[column]]
     elif column == 'Treatment Modality':
         user_input[column] = st.selectbox(f"{label}:", options=["Endovascular Coiling",
                                                                 "Neurosurgical Clipping"])
-        user_input[column] = 0 if user_input[column] == "Endovascular Coiling" else 1
 
-# Prepare the input data as adataframe
+# Prepare the input data as a DataFrame
 input_df = pd.DataFrame([user_input])
 
 # Preprocess the input data
-# Note: Make sure to preprocess the input data in the same way as the training data
-input_scaled = scaler.transform(input_df)
+input_preprocessed = preprocessor.transform(input_df)
 
 # Make the prediction
-prediction = (mlp.predict(input_scaled) > 0.5).astype("int32")
-confidence = mlp.predict(input_scaled) * 100
+prediction = (mlp.predict(input_preprocessed) > 0.5).astype("int32")
+confidence = mlp.predict(input_preprocessed) * 100
 
 # Display the result
 if st.button("Make Prediction"):
