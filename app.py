@@ -25,8 +25,8 @@ y = data['dci']
 # Define the column transformer for preprocessing
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', StandardScaler(), X.columns),
-        ('cat', OneHotEncoder(), ['Location of Aneurysm', 'Treatment Modality'])
+        ('num', StandardScaler(), X.drop(columns=['Location of Aneurysm', 'Treatment Modality', 'Side']).columns),
+        ('cat', OneHotEncoder(), ['Location of Aneurysm', 'Treatment Modality', 'Side'])
     ])
 
 # Apply the column transformer to the data
@@ -47,6 +47,21 @@ mlp.fit(X_train, y_train, epochs=50, batch_size=32, verbose=0)
 
 # Create input fields for each feature
 user_input = {}
+location_mapping = {
+    "Anterior Communicating Artery": 1,
+    "Middle Cerebral Artery": 2,
+    "Anterior Cerebral Artery": 3,
+    "Internal Carotid Artery": 4,
+    "Posterior Communicating Artery": 5,
+    "Basilar Artery": 6,
+    "Posterior Inferior Cerebellar Artery": 7
+}
+
+side_mapping = {
+    "Right": 0,
+    "Left": 1,
+}
+
 for column in X.columns:
     label = column.capitalize()
 
@@ -56,13 +71,8 @@ for column in X.columns:
         user_input[column] = st.selectbox(f"{label} (Yes/No):", options=["Yes", "No"])
         user_input[column] = 1 if user_input[column] == "Yes" else 0
     elif column == 'Location of Aneurysm':
-        user_input[column] = st.selectbox(f"{label}:", options=["Anterior Communicating Artery",
-                                                                "Middle Cerebral Artery",
-                                                                "Anterior Cerebral Artery",
-                                                                "Internal Carotid Artery",
-                                                                "Posterior Communicating Artery",
-                                                                "Basilar Artery",
-                                                                "Posterior Inferior Cerebellar Artery"])
+        user_input[column] = st.selectbox(f"{label}:", options=list(location_mapping.keys()))
+        user_input[column] = location_mapping[user_input[column]]
     elif column == 'Treatment Modality':
         user_input[column] = st.selectbox(f"{label}:", options=["Endovascular Coiling",
                                                                 "Neurosurgical Clipping"])
@@ -72,21 +82,19 @@ for column in X.columns:
     elif column in ['HH Score', 'mFisher Score']:
         user_input[column] = st.number_input(f"{label}:", min_value=0, step=1, format="%i")
     elif column == 'Side':
-        user_input[column] = st.selectbox(f"{label}:", options= ["Right", "Left"])
-
-# Prepare the input data as a DataFrame
-input_df = pd.DataFrame([user_input])
+        user_input[column] = st.selectbox(f"{label}:", options=list(side_mapping.keys()))
+        user_input[column] = side_mapping[user_input[column]]
+        
+# Collect input data into a DataFrame
+input_df = pd.DataFrame(user_input, index=[0])
 
 # Preprocess the input data
 input_preprocessed = preprocessor.transform(input_df)
 
-# Make the prediction
-prediction = (mlp.predict(input_preprocessed) > 0.5).astype("int32")
-confidence = mlp.predict(input_preprocessed) * 100
+# Make a prediction
+prediction = mlp.predict(input_preprocessed)
+prediction = (prediction > 0.5).astype(int)
 
 # Display the result
-if st.button("Make Prediction"):
-    if prediction[0] == 0:
-        st.write(f"Delayed Cerebral Ischemia is not predicted to occur. Confidence: {confidence[0][0]:.2f}%")
-    else:
-        st.write(f"Delayed Cerebral Ischemia is predicted to occur. Confidence: {confidence[0][0]:.2f}%")
+result = "Positive" if prediction[0][0] == 1 else "Negative"
+st.write(f"Predicted DCI: **{result}**")
