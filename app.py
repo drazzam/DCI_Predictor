@@ -42,22 +42,22 @@ mlp.fit(X_train_scaled, y_train, epochs=50, batch_size=32, verbose=0)
 
 # Dictionary to map column names to user-friendly labels
 col_labels = {
-    'nimodipine': 'Nimodipine',
-    'hypertension': 'Hypertension',
-    'diabetes': 'Diabetes',
-    'hypercholestorelemia': 'Hypercholesterolemia',
-    'congestive_heart_failure': 'Congestive Heart Failure',
-    'cancer': 'Cancer',
-    'smoking': 'Smoking',
-    'alcohol': 'Alcohol',
-    'cocaine': 'Cocaine',
-    'location_of_aneurysm': 'Location of Aneurysm',
-    'treatment_modality': 'Treatment Modality',
-    'evd': 'EVD',
-    'vp_shunt': 'VP Shunt',
-    'tcd_vasospasm': 'TCD Vasospasm',
-    'angiographic_vasospasm': 'Angiographic Vasospasm',
-    'clinical_vasospasm': 'Clinical Vasospasm'
+    'Nimodipine': 'Nimodipine',
+    'Hypertension': 'Hypertension',
+    'Diabetes': 'Diabetes',
+    'Hypercholestorelemia': 'Hypercholesterolemia',
+    'Congestive Heart Failure': 'Congestive Heart Failure',
+    'Cancer': 'Cancer',
+    'Smoking': 'Smoking',
+    'Alcohol': 'Alcohol',
+    'Cocaine': 'Cocaine',
+    'Location of Aneurysm': 'Location of Aneurysm',
+    'Treatment Modality': 'Treatment Modality',
+    'EVD': 'EVD',
+    'VP Shunt': 'VP Shunt',
+    'TCD Vasospasm': 'TCD Vasospasm',
+    'Angiographic Vasospasm': 'Angiographic Vasospasm',
+    'Clinical Vasospasm': 'Clinical Vasospasm'
 }
 
 # Create input fields for each feature
