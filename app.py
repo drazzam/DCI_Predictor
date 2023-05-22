@@ -80,7 +80,7 @@ for column in X.columns:
         user_input[column] = location_mapping[user_input[column]]
     elif column == 'Treatment Modality':
         user_input[column] = st.selectbox(f"{label}:", options=list(treatment_mapping.keys()))
-        user_input[column] = location_mapping[user_input[column]]
+        user_input[column] = treatment_mapping[user_input[column]]
     elif column in ['WBCs on Admission', 'Age', 'BMI', 'Size', 'WBCs', 'Neutrophils', 'Lymphocytes', 'Albumin', 'MCV', 'Platelets',
                     'Red Cell Distribution Width', 'Monocytes', 'BUN', 'Creatinine', 'INR', 'PTT']:
         user_input[column] = st.number_input(f"{label}:", step=None, format="%f")
