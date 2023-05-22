@@ -102,5 +102,5 @@ prediction = (prediction > 0.5).astype(int)
 
 # Display the result
 if st.button("Make Prediction"):
- result = "Positive" if prediction[0][0] == 1 else "Negative"
- st.write(f"Predicted DCI: **{result}**")
+ result = "Delayed Cerebral Ischemia Is Predicted to Occur In This Patient" if prediction[0][0] == 1 else "Delayed Cerebral Ischemia Is NOT Predicted to Occur In This Patient"
+ st.write(f"Prediction: **{result}**")
