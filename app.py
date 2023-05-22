@@ -1,32 +1,11 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
+import urllib.request
 from sklearn.preprocessing import StandardScaler
 from tensorflow.keras.models import load_model
 import joblib
-import requests
-from io import BytesIO
-import tempfile
-
-# Download and load the trained model and scaler
-model_url = "https://github.com/drazzam/DCI_Predictor/raw/main/trained_model.h5"
-scaler_url = "https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl"
-
-model_response = requests.get(model_url)
-scaler_response = requests.get(scaler_url)
-
-# Save model and scaler as temporary files
-temp_model_file = tempfile.NamedTemporaryFile(suffix='.h5', delete=False)
-temp_model_file.write(model_response.content)
-temp_model_file.close()
-
-temp_scaler_file = tempfile.NamedTemporaryFile(suffix='.pkl', delete=False)
-temp_scaler_file.write(scaler_response.content)
-temp_scaler_file.close()
-
-# Load model and scaler from temporary files
-mlp = load_model(temp_model_file.name)
-scaler = joblib.load(temp_scaler_file.name)
 
 # Define the input features and their types
 features = [
@@ -89,6 +68,20 @@ categorical_features = [
 ]
 
 input_df = pd.get_dummies(input_df, columns=categorical_features)
+
+@st.experimental_singleton
+def load_trained_model_and_scaler():
+    if not os.path.isfile('trained_model.h5'):
+        urllib.request.urlretrieve('https://github.com/drazzam/DCI_Predictor/raw/main/trained_model.h5', 'trained_model.h5')
+    if not os.path.isfile('scaler.pkl'):
+        urllib.request.urlretrieve('https://github.com/drazzam/DCI_Predictor/raw/main/scaler.pkl', 'scaler.pkl')
+
+    mlp = load_model('trained_model.h5')
+    scaler = joblib.load('scaler.pkl')
+    return mlp, scaler
+
+mlp, scaler = load_trained_model_and_scaler()
+
 X = scaler.transform(input_df)
 
 # Make the prediction
