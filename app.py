@@ -66,6 +66,11 @@ for column in X.columns:
     elif column == 'Treatment Modality':
         user_input[column] = st.selectbox(f"{label}:", options=["Endovascular Coiling",
                                                                 "Neurosurgical Clipping"])
+    elif column in ['WBCs on Admission', 'Age', 'BMI', 'Size', 'WBCs', 'Neutrophils', 'Lymphocytes', 'Albumin', 'MCV', 'Platelets',
+                    'Red Cell Distribution Width', 'Monocytes', 'BUN', 'Creatinine', 'INR', 'PTT']:
+        user_input[column] = st.number_input(f"{label}:", step=None, format="%f")
+    elif column in ['HH Score', 'mFisher Score']:
+        user_input[column] = st.number_input(f"{label}:", step=1, format="%i")
 
 # Prepare the input data as a DataFrame
 input_df = pd.DataFrame([user_input])
