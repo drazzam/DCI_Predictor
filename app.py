@@ -68,12 +68,12 @@ for column in X.columns:
     else:
         label = column.capitalize()
 
-    if column in ['nimodipine', 'hypertension', 'diabetes', 'hypercholestorelemia',
-                  'congestive_heart_failure', 'cancer', 'smoking', 'alcohol', 'cocaine',
-                  'evd', 'vp_shunt', 'tcd_vasospasm', 'angiographic_vasospasm', 'clinical_vasospasm']:
+    if column in ['Nimodipine', 'Hypertension', 'Diabetes', 'Hypercholestorelemia',
+                  'Congestive Heart Failure', 'Cancer', 'Smoking', 'Alcohol', 'Cocaine',
+                  'EVD', 'VP Shunt', 'TCD Vasospasm', 'Angiographic Vasospasm', 'Clinical Vasospasm']:
         user_input[column] = st.selectbox(f"{label} (Yes/No):", options=["Yes", "No"])
         user_input[column] = 1 if user_input[column] == "Yes" else 0
-    elif column == 'location_of_aneurysm':
+    elif column == 'Location of Aneurysm':
         user_input[column] = st.selectbox(f"{label}:", options=["Anterior Communicating Artery",
                                                                 "Middle Cerebral Artery",
                                                                 "Anterior Cerebral Artery",
@@ -88,7 +88,7 @@ for column in X.columns:
                               "Posterior Communicating Artery": 5,
                               "Basilar Artery": 6,
                               "Posterior Inferior Cerebellar Artery": 7}[user_input[column]]
-    elif column == 'treatment_modality':
+    elif column == 'Treatment Modality':
         user_input[column] = st.selectbox(f"{label}:", options=["Endovascular Coiling",
                                                                 "Neurosurgical Clipping"])
         user_input[column] = 0 if user_input[column] == "Endovascular Coiling" else 1
