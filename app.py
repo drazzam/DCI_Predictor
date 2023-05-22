@@ -96,9 +96,9 @@ for column in X.columns:
     elif column in ['HH Score', 'mFisher Score']:
         user_input[column] = st.number_input(f"{label}:", min_value=0, step=1, format="%i")
     elif column == 'Side':
-        user_input[column] = st.selectbox(f"{label}:", options=list(side_mapping.keys()))
+        user_input[column] = st.selectbox(f"{label}: ", options=list(side_mapping.keys()))
         user_input[column] = side_mapping[user_input[column]]
-        
+
 # Collect input data into a DataFrame
 input_df = pd.DataFrame(user_input, index=[0])
 
@@ -106,10 +106,12 @@ input_df = pd.DataFrame(user_input, index=[0])
 input_preprocessed = preprocessor.transform(input_df)
 
 # Make a prediction
-prediction = mlp.predict(input_preprocessed)
-prediction = (prediction > 0.5).astype(int)
+prediction_proba = mlp.predict(input_preprocessed)
+prediction = (prediction_proba > 0.5).astype(int)
+confidence_percentage = round(prediction_proba[0][0] * 100, 2) if prediction[0][0] == 1 else round((1 - prediction_proba[0][0]) * 100, 2)
 
 # Display the result
 if st.button("Make Prediction"):
- result = "Delayed Cerebral Ischemia Is Predicted to Occur In This Patient" if prediction[0][0] == 1 else "Delayed Cerebral Ischemia Is NOT Predicted to Occur In This Patient"
- st.write(f"Prediction: **{result}**")
+    result = "Delayed Cerebral Ischemia Is Predicted to Occur In This Patient" if prediction[0][0] == 1 else "Delayed Cerebral Ischemia Is NOT Predicted to Occur In This Patient"
+    st.write(f"Prediction: **{result}**")
+    st.write(f"Confidence: **{confidence_percentage}%**")
