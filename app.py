@@ -11,6 +11,15 @@ from tensorflow.keras.optimizers import Adam
 import requests
 from io import BytesIO
 
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 st.title("Delayed Cerebral Ischemia Prediction")
 
 # Load the dataset from a CSV file
