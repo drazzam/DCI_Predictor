@@ -70,7 +70,7 @@ for column in X.columns:
                     'Red Cell Distribution Width', 'Monocytes', 'BUN', 'Creatinine', 'INR', 'PTT']:
         user_input[column] = st.number_input(f"{label}:", step=None, format="%f")
     elif column in ['HH Score', 'mFisher Score']:
-        user_input[column] = st.number_input(f"{label}:", step=1, format="%i")
+        user_input[column] = st.number_input(f"{label}:", min_value=0, step=1, format="%i")
 
 # Prepare the input data as a DataFrame
 input_df = pd.DataFrame([user_input])
@@ -87,4 +87,4 @@ if st.button("Make Prediction"):
     if prediction[0] == 0:
         st.write(f"Delayed Cerebral Ischemia is not predicted to occur. Confidence: {confidence[0][0]:.2f}%")
     else:
-        st.write(f"Delayed Cerebral Ischemia is predicted to occur. Confidence: {confidence[0][1]:.2f}%")
+        st.write(f"Delayed Cerebral Ischemia is predicted to occur. Confidence: {confidence[0][0]:.2f}%")
