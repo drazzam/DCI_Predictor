@@ -76,6 +76,27 @@ treatment_mapping = {
     "Neurosurgical Clipping": 1,
 }
 
+label_mapping = {
+    "WBCs on Admission": "WBCs on Admission",
+    "HH Score": "HH Score",
+    "mFisher Score": "mFisher Score",
+    "Hypercholestorelemia": "Hypercholesterolemia",
+    "Congestive Heart Failure": "Congestive Heart Failure",
+    "Location of Aneurysm": "Location of Aneurysm",
+    "Treatment Modality": "Treatment Modality",
+    "EVD": "External Ventricular Drain",
+    "VP Shunt": "VP Shunt",
+    "TCD Vasospasm": "TCD Vasospasm",
+    "Angiographic Vasospasm": "Angiographic Vasospasm",
+    "Clinical Vasospasm": "Clinical Vasospasm",
+    "WBCs": "White Blood Cells Count",
+    "MCV": "MCV",
+    "Red Cell Distribution Width": "Red Cell Distribution Width",
+    "BUN": "BUN",
+    "INR": "INR",
+    "PTT": "PTT"
+}
+
 for column in X.columns:
     label = column.capitalize()
 
