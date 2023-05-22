@@ -101,5 +101,6 @@ prediction = mlp.predict(input_preprocessed)
 prediction = (prediction > 0.5).astype(int)
 
 # Display the result
-result = "Positive" if prediction[0][0] == 1 else "Negative"
-st.write(f"Predicted DCI: **{result}**")
+if st.button("Make Prediction"):
+ result = "Positive" if prediction[0][0] == 1 else "Negative"
+ st.write(f"Predicted DCI: **{result}**")
